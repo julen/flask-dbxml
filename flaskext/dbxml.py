@@ -71,7 +71,6 @@ class DBXML(object):
 
     def init_app(self, app):
         app.config.setdefault('DBXML_DATABASE', 'default.dbxml')
-        app.config.setdefault('DBXML_DEFAULT_COLLECTION', 'default.dbxml')
 
         self.connect(app)
 

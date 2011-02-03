@@ -88,6 +88,8 @@ class DBXML(object):
         return os.path.basename(current_app.config['DBXML_DATABASE'])
 
     def query(self, query_string):
+        query_string = query_string.encode('utf-8')
+
         query = "collection('{0}'){1}".format(self.collection, query_string)
 
         return self.raw_query(query)

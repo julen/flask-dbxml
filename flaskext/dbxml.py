@@ -16,8 +16,6 @@ from werkzeug.utils import cached_property
 
 import dbxml
 
-import os
-
 
 def xmlresult(fn):
     """Requires the result passed to be an instance of XmlResults."""
@@ -85,7 +83,7 @@ class DBXML(object):
 
     @cached_property
     def collection(self):
-        return os.path.basename(current_app.config['DBXML_DATABASE'])
+        return 'dbxml:///' + current_app.config['DBXML_DATABASE']
 
     def query(self, query_string):
         query_string = query_string.encode('utf-8')

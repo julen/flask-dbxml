@@ -10,7 +10,7 @@
 """
 from __future__ import absolute_import
 
-from flask import abort, current_app, g
+from flask import current_app, g
 
 from werkzeug.utils import cached_property
 
@@ -101,6 +101,6 @@ class DBXML(object):
         try:
             result = self.manager.query(query, query_context)
         except dbxml.XmlException:
-            abort(500)
+            result = []
 
         return Result(result)

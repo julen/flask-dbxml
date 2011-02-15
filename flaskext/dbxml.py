@@ -65,7 +65,12 @@ class DBXML(object):
     def connect(self, app):
         # XXX: Investigate if DBXML_ALLOW_AUTO_OPEN is really necessary
         self.manager = dbxml.XmlManager(dbxml.DBXML_ALLOW_AUTO_OPEN)
-        self.container = self.manager.openContainer(app.config['DBXML_DATABASE'])
+
+        self.container_config = dbxml.XmlContainerConfig()
+        self.container_config.setAllowCreate(True)
+
+        self.container = self.manager.openContainer(app.config['DBXML_DATABASE'],
+                                                    self.container_config)
 
     def init_app(self, app):
         app.config.setdefault('DBXML_DATABASE', 'default.dbxml')
@@ -84,6 +89,27 @@ class DBXML(object):
     @cached_property
     def collection(self):
         return 'dbxml:///' + current_app.config['DBXML_DATABASE']
+
+    def init_dbxml(self, filename=None, docname=None):
+        if filename is None:
+            return
+
+        if self.manager is None or self.container is None:
+            self.connect()
+
+        update_context = self.manager.createUpdateContext()
+
+        doc = open(filename)
+
+        if docname is None:
+            import os
+            docname = os.path.basename(filename)
+
+        try:
+            self.container.putDocument(docname, doc.read(), update_context)
+            print 'Document added successfully.'
+        except dbxml.XmlUniqueError:
+            print 'Document already in container. Skipping.'
 
     def query(self, query_string):
         query_string = query_string.encode('utf-8')

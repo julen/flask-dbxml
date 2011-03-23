@@ -10,7 +10,7 @@
 """
 from __future__ import absolute_import
 
-from flask import current_app, g
+from flask import _request_ctx_stack, current_app
 
 from werkzeug.utils import cached_property
 
@@ -79,12 +79,19 @@ class DBXML(object):
 
         @app.before_request
         def before_request():
-            g.dbxml = self
+            ctx = _request_ctx_stack.top
+            ctx.dbxml = self
 
         @app.after_request
         def after_request(response):
-            del g.dbxml
+            ctx = _request_ctx_stack.top
+            del ctx.dbxml
             return response
+
+    def get_db(self):
+        ctx = _request_ctx_stack.top
+        if ctx is not None:
+            return ctx.dbxml
 
     @cached_property
     def collection(self):

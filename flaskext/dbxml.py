@@ -118,16 +118,19 @@ class DBXML(object):
         except dbxml.XmlUniqueError:
             print 'Document already in container. Skipping.'
 
-    def query(self, query_string):
+    def query(self, query_string, context={}):
         query_string = query_string.encode('utf-8')
 
         query = "collection('{0}'){1}".format(self.collection, query_string)
 
-        return self.raw_query(query)
+        return self.raw_query(query, context)
 
-    def raw_query(self, query):
+    def raw_query(self, query, context={}):
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
+
+        for key, value in context.iteritems():
+            query_context.setVariableValue(key, dbxml.XmlValue(value))
 
         query_expression = self.manager.prepare(query, query_context)
 

@@ -125,6 +125,14 @@ class DBXML(object):
 
         return self.raw_query(query, context)
 
+    def template_query(self, template_name, dbxml_context={}, jinja_context={}):
+        jinja_context.update({'collection': self.collection})
+
+        template = current_app.jinja_env.get_template(template_name)
+        rendered_query = template.render(jinja_context).encode('utf-8')
+
+        return self.raw_query(rendered_query, dbxml_context)
+
     def raw_query(self, query, context={}):
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)

@@ -138,7 +138,7 @@ class DBXML(object):
         query_context.setEvaluationType(query_context.Lazy)
 
         for key, value in context.iteritems():
-            query_context.setVariableValue(key, dbxml.XmlValue(value))
+            query_context.setVariableValue(key, dbxml.XmlValue(str(value)))
 
         query_expression = self.manager.prepare(query, query_context)
 

@@ -10,7 +10,7 @@
 """
 from __future__ import absolute_import
 
-from flask import _request_ctx_stack, current_app
+from flask import _request_ctx_stack, current_app, render_template_string
 
 from werkzeug.utils import cached_property
 
@@ -34,6 +34,11 @@ class Result(object):
 
     def as_str(self):
         self.filter = lambda x: x.asString().decode('utf-8')
+
+        return self
+
+    def as_rendered(self):
+        self.filter = lambda x: render_template_string(x.asString())
 
         return self
 
@@ -125,13 +130,16 @@ class DBXML(object):
 
         return self.raw_query(query, context)
 
-    def template_query(self, template_name, dbxml_context={}, jinja_context={}):
-        dbxml_context.update({'collection': self.collection})
+    def template_query(self, template_name, context={}):
+        context.update({'collection': self.collection})
 
-        template = current_app.jinja_env.get_template(template_name)
-        rendered_query = template.render(jinja_context).encode('utf-8')
+        # Open the template source, and pass it as the XQuery query
+        jinja_env = current_app.jinja_env
+        (query, filename, uptodate) = jinja_env.loader \
+            .get_source(jinja_env, template_name)
+        query = str(query.encode('utf-8'))
 
-        return self.raw_query(rendered_query, dbxml_context)
+        return self.raw_query(query, context)
 
     def raw_query(self, query, context={}):
         query_context = self.manager.createQueryContext()

@@ -126,7 +126,7 @@ class DBXML(object):
         return self.raw_query(query, context)
 
     def template_query(self, template_name, dbxml_context={}, jinja_context={}):
-        jinja_context.update({'collection': self.collection})
+        dbxml_context.update({'collection': self.collection})
 
         template = current_app.jinja_env.get_template(template_name)
         rendered_query = template.render(jinja_context).encode('utf-8')

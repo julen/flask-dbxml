@@ -38,7 +38,8 @@ class Result(object):
         return self
 
     def as_rendered(self):
-        self.filter = lambda x: render_template_string(x.asString())
+        self.filter = lambda x: render_template_string(x.asString()
+                                                        .decode('utf-8'))
 
         return self
 

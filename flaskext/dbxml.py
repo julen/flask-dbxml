@@ -59,7 +59,7 @@ class Result(object):
         if self.xmlresults.hasNext():
             self.resultset.append(self.filter(self.xmlresults.next()))
 
-        return self.resultset
+        return self.resultset[0]
 
 
 class DBXML(object):

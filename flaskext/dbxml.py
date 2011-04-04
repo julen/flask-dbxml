@@ -112,14 +112,14 @@ class DBXML(object):
 
         update_context = self.manager.createUpdateContext()
 
-        doc = open(filename)
-
         if docname is None:
             import os
             docname = os.path.basename(filename)
 
+        xml_input = self.manager.createLocalFileInputStream(filename)
+
         try:
-            self.container.putDocument(docname, doc.read(), update_context)
+            self.container.putDocument(docname, xml_input, update_context)
             print 'Document added successfully.'
         except dbxml.XmlUniqueError:
             print 'Document already in container. Skipping.'

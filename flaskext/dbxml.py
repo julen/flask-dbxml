@@ -15,6 +15,7 @@ from flask import _request_ctx_stack, current_app, render_template_string
 from werkzeug.utils import cached_property
 
 import dbxml
+import os
 
 
 def xmlresult(fn):
@@ -69,7 +70,6 @@ class DBXML(object):
         self.container = None
 
     def connect(self, app):
-        # XXX: Investigate if DBXML_ALLOW_AUTO_OPEN is really necessary
         self.manager = dbxml.XmlManager(dbxml.DBXML_ALLOW_AUTO_OPEN)
 
         self.container_config = dbxml.XmlContainerConfig()
@@ -107,13 +107,11 @@ class DBXML(object):
         if filename is None:
             return
 
-        if self.manager is None or self.container is None:
-            self.connect()
+        filename = os.path.abspath(filename)
 
         update_context = self.manager.createUpdateContext()
 
         if docname is None:
-            import os
             docname = os.path.basename(filename)
 
         xml_input = self.manager.createLocalFileInputStream(filename)

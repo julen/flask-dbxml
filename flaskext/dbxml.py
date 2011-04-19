@@ -158,3 +158,24 @@ class DBXML(object):
             result = []
 
         return Result(result)
+
+    def insert_before(self, xml, where):
+        query = "insert nodes {0} before collection('{1}'){2}". \
+                format(xml, self.collection, where)
+
+        print query
+
+        return self.insert_raw(query)
+
+    def insert_raw(self, query):
+        query_context = self.manager.createQueryContext()
+        query_context.setEvaluationType(query_context.Lazy)
+
+        query_expression = self.manager.prepare(query, query_context)
+
+        try:
+            self.manager.query(query, query_context)
+            return True
+        except dbxml.XmlException, e:
+            print e
+            return False

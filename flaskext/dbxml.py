@@ -163,8 +163,6 @@ class DBXML(object):
         query = "insert nodes {0} before collection('{1}'){2}". \
                 format(xml, self.collection, where)
 
-        print query
-
         return self.insert_raw(query)
 
     def insert_raw(self, query):
@@ -177,5 +175,4 @@ class DBXML(object):
             self.manager.query(query, query_context)
             return True
         except dbxml.XmlException, e:
-            print e
             return False

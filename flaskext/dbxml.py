@@ -60,7 +60,10 @@ class Result(object):
         if self.xmlresults.hasNext():
             self.resultset.append(self.filter(self.xmlresults.next()))
 
-        return self.resultset[0]
+        try:
+            return self.resultset[0]
+        except IndexError:
+            return None
 
 
 class DBXML(object):

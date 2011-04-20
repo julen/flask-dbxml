@@ -10,10 +10,11 @@
 """
 from __future__ import absolute_import
 
-from flask import _request_ctx_stack, current_app, render_template_string
+from flask import _request_ctx_stack, abort, current_app, render_template_string
 
 from werkzeug.utils import cached_property
 
+from bsddb3.db import *
 import dbxml
 import os
 
@@ -73,13 +74,19 @@ class DBXML(object):
         self.container = None
 
     def connect(self, app):
-        self.manager = dbxml.XmlManager(dbxml.DBXML_ALLOW_AUTO_OPEN)
+        self.env = DBEnv()
+        self.env.open(app.config['DBXML_ENV'],
+                      DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG| \
+                      DB_INIT_MPOOL|DB_INIT_TXN, 0)
 
-        self.container_config = dbxml.XmlContainerConfig()
-        self.container_config.setAllowCreate(True)
+        self.manager = dbxml.XmlManager(self.env, 0)
 
-        self.container = self.manager.openContainer(app.config['DBXML_DATABASE'],
-                                                    self.container_config)
+        try:
+            self.container = self.manager. \
+                openContainer(app.config['DBXML_DATABASE'],
+                              DB_CREATE|dbxml.DBXML_TRANSACTIONAL)
+        except dbxml.XmlException:
+            abort(500)
 
     def init_app(self, app):
         app.config.setdefault('DBXML_DATABASE', 'default.dbxml')
@@ -113,6 +120,7 @@ class DBXML(object):
         filename = os.path.abspath(filename)
 
         update_context = self.manager.createUpdateContext()
+        txn = self.manager.createTransaction()
 
         if docname is None:
             docname = os.path.basename(filename)
@@ -120,11 +128,14 @@ class DBXML(object):
         xml_input = self.manager.createLocalFileInputStream(filename)
 
         try:
-            self.container.putDocument(docname, xml_input, update_context)
-            self.container.sync()
+            self.container.putDocument(txn, docname, xml_input, update_context)
+            txn.commit()
             print 'Document added successfully.'
         except dbxml.XmlUniqueError:
             print 'Document already in container. Skipping.'
+        except dbxml.XmlException:
+            txn.abort()
+            print 'Transaction failed. Aborting.'
 
     def query(self, query_string, context={}):
         query_string = query_string.encode('utf-8')
@@ -170,10 +181,14 @@ class DBXML(object):
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
 
-        query_expression = self.manager.prepare(query, query_context)
+        txn = self.manager.createTransaction()
+
+        query_expression = self.manager.prepare(txn, query, query_context)
 
         try:
-            self.manager.query(query, query_context)
+            self.manager.query(txn, query, query_context)
+            txn.commit()
             return True
         except dbxml.XmlException, e:
+            txn.abort()
             return False

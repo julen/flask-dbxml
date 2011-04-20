@@ -15,14 +15,15 @@ from flask import _request_ctx_stack, abort, current_app, render_template_string
 from werkzeug.utils import cached_property
 
 from bsddb3.db import *
-import dbxml
+from dbxml import *
+
 import os
 
 
 def xmlresult(fn):
     """Requires the result passed to be an instance of XmlResults."""
     def wrapper(obj, *args, **kwargs):
-        if isinstance(obj.xmlresults, dbxml.XmlResults):
+        if isinstance(obj.xmlresults, XmlResults):
             return fn(obj, *args, **kwargs)
     return wrapper
 
@@ -79,13 +80,13 @@ class DBXML(object):
                       DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG| \
                       DB_INIT_MPOOL|DB_INIT_TXN, 0)
 
-        self.manager = dbxml.XmlManager(self.env, 0)
+        self.manager = XmlManager(self.env, 0)
 
         try:
             self.container = self.manager. \
                 openContainer(app.config['DBXML_DATABASE'],
-                              DB_CREATE|dbxml.DBXML_TRANSACTIONAL)
-        except dbxml.XmlException:
+                              DB_CREATE|DBXML_TRANSACTIONAL)
+        except XmlException:
             abort(500)
 
     def init_app(self, app):
@@ -131,9 +132,9 @@ class DBXML(object):
             self.container.putDocument(txn, docname, xml_input, update_context)
             txn.commit()
             print 'Document added successfully.'
-        except dbxml.XmlUniqueError:
+        except XmlUniqueError:
             print 'Document already in container. Skipping.'
-        except dbxml.XmlException:
+        except XmlException:
             txn.abort()
             print 'Transaction failed. Aborting.'
 
@@ -160,13 +161,13 @@ class DBXML(object):
         query_context.setEvaluationType(query_context.Lazy)
 
         for key, value in context.iteritems():
-            query_context.setVariableValue(key, dbxml.XmlValue(str(value)))
+            query_context.setVariableValue(key, XmlValue(str(value)))
 
         query_expression = self.manager.prepare(query, query_context)
 
         try:
             result = self.manager.query(query, query_context)
-        except dbxml.XmlException:
+        except XmlException:
             result = []
 
         return Result(result)
@@ -189,6 +190,6 @@ class DBXML(object):
             self.manager.query(txn, query, query_context)
             txn.commit()
             return True
-        except dbxml.XmlException, e:
+        except XmlException, e:
             txn.abort()
             return False

@@ -121,6 +121,7 @@ class DBXML(object):
 
         try:
             self.container.putDocument(docname, xml_input, update_context)
+            self.container.sync()
             print 'Document added successfully.'
         except dbxml.XmlUniqueError:
             print 'Document already in container. Skipping.'

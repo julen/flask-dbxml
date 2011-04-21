@@ -82,6 +82,9 @@ class DBXML(object):
 
         self.manager = XmlManager(self.env, 0)
 
+        self.db = DB(self.env)
+        self.db.open(app.config['DBXML_ENV'] + 'seq.db', DB_BTREE,
+                     DB_AUTO_COMMIT|DB_CREATE)
         try:
             self.container = self.manager. \
                 openContainer(app.config['DBXML_DATABASE'],
@@ -137,6 +140,12 @@ class DBXML(object):
         except XmlException:
             txn.abort()
             print 'Transaction failed. Aborting.'
+
+    def generate_id(self, key):
+        seq = DBSequence(self.db)
+        seq.open(key, txn=None, flags=DB_CREATE)
+
+        return seq.get()
 
     def query(self, query_string, context={}):
         query_string = query_string.encode('utf-8')

@@ -169,6 +169,8 @@ class DBXML(object):
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
 
+        query_context.setBaseURI(current_app.config['DBXML_BASE_URI'])
+
         for key, value in context.iteritems():
             query_context.setVariableValue(key, XmlValue(str(value)))
 

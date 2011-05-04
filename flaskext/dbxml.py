@@ -80,7 +80,7 @@ class DBXML(object):
                       DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG| \
                       DB_INIT_MPOOL|DB_INIT_TXN, 0)
 
-        self.manager = XmlManager(self.env, 0)
+        self.manager = XmlManager(self.env, DBXML_ALLOW_EXTERNAL_ACCESS)
 
         self.db = DB(self.env)
         self.db.open(app.config['DBXML_ENV'] + 'seq.db', DB_BTREE,

@@ -210,8 +210,8 @@ class DBXML(object):
         return Result(result)
 
     def insert_before(self, xml, where):
-        query = "insert nodes {0} before collection('{1}'){2}". \
-                format(xml, self.collection, where)
+        query = u"insert nodes {0} before collection('{1}'){2}". \
+                format(xml, self.collection, where).encode('utf-8')
 
         return self.insert_raw(query)
 

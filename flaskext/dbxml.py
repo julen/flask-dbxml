@@ -115,7 +115,7 @@ class DBXML(object):
                 openContainer(app.config['DBXML_DATABASE'],
                               DB_CREATE|DBXML_TRANSACTIONAL)
         except XmlException:
-            abort(500)
+            raise
 
     def init_app(self, app):
         app.config.setdefault('DBXML_DATABASE', 'default.dbxml')

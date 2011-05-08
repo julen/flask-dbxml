@@ -172,7 +172,8 @@ class DBXML(object):
         query_context.setBaseURI(current_app.config['DBXML_BASE_URI'])
 
         for key, value in context.iteritems():
-            query_context.setVariableValue(key, XmlValue(str(value)))
+            newval = str(value) if isinstance(value, unicode) else value
+            query_context.setVariableValue(key, XmlValue(newval))
 
         query_expression = self.manager.prepare(query, query_context)
 

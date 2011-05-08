@@ -67,6 +67,15 @@ class Result(object):
         except IndexError:
             return None
 
+    @xmlresult
+    def first_or_404(self):
+        result = self.first()
+
+        if result is None:
+            abort(404)
+
+        return result
+
 
 class DBXML(object):
 

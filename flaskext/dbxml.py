@@ -198,7 +198,8 @@ class DBXML(object):
 
         for key, value in context.iteritems():
             if value is not None:
-                newval = str(value) if isinstance(value, unicode) else value
+                newval = value.encode('utf-8') if isinstance(value, unicode) \
+                        else value
                 query_context.setVariableValue(key, XmlValue(newval))
 
         query_expression = self.manager.prepare(query, query_context)

@@ -191,16 +191,38 @@ class DBXML(object):
         return self.raw_query(query, context)
 
     def raw_query(self, query, context={}):
+
+        def _encoded_xml_value(val):
+
+            if isinstance(val, unicode):
+                newval = val.encode('utf-8')
+            else:
+                newval = str(val)
+
+            return XmlValue(newval)
+
+        def _populate_context(qc, ctx):
+            for key, value in ctx.iteritems():
+                if value is None:
+                    continue
+
+                if isinstance(value, dict):
+                    _populate_context(qc, value)
+                elif isinstance(value, list):
+                    for val in value:
+                        newval = self.manager.createResults()
+                        newval.add(_encoded_xml_value(val))
+                else:
+                    newval = _encoded_xml_value(value)
+
+                qc.setVariableValue(key, newval)
+
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
 
         query_context.setBaseURI(current_app.config['DBXML_BASE_URI'])
 
-        for key, value in context.iteritems():
-            if value is not None:
-                newval = value.encode('utf-8') if isinstance(value, unicode) \
-                        else value
-                query_context.setVariableValue(key, XmlValue(newval))
+        _populate_context(query_context, context)
 
         query_expression = self.manager.prepare(query, query_context)
 

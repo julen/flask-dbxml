@@ -180,7 +180,6 @@ class DBXML(object):
         return self.raw_query(query, context)
 
     def template_query(self, template_name, context={}):
-        context.update({'collection': self.collection})
 
         # Open the template source, and pass it as the XQuery query
         jinja_env = current_app.jinja_env

@@ -217,6 +217,8 @@ class DBXML(object):
 
                 qc.setVariableValue(key, newval)
 
+        context.update({'collection': self.collection})
+
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
 

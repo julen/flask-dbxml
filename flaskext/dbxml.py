@@ -240,6 +240,12 @@ class DBXML(object):
 
         return self.insert_raw(query)
 
+    def insert_after(self, xml, where):
+        query = u"insert nodes {0} after collection('{1}'){2}". \
+                format(xml, self.collection, where).encode('utf-8')
+
+        return self.insert_raw(query)
+
     def insert_raw(self, query):
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)

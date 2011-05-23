@@ -252,6 +252,12 @@ class DBXML(object):
 
         return self.insert_raw(query)
 
+    def replace_value(self, old, new):
+        query = u'replace value of node collection("{0}"){1} with "{2}"'. \
+                format(self.collection, old, new).encode('utf-8')
+
+        return self.insert_raw(query)
+
     def insert_raw(self, query):
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)

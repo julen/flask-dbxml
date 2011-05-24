@@ -17,7 +17,7 @@ from setuptools import setup
 
 setup(
     name='Flask-DBXML',
-    version='0.1',
+    version='0.2',
     url='http://github.com/julen/flask-dbxml',
     license='BSD',
     author='Julen Ruiz Aizpuru',

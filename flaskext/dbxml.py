@@ -235,25 +235,25 @@ class DBXML(object):
         return Result(result)
 
     def insert_before(self, xml, where):
-        query = u"insert nodes {0} before collection('{1}'){2}". \
+        query = u'insert nodes {0} before collection("{1}"){2}'. \
                 format(xml, self.collection, where).encode('utf-8')
 
         return self.insert_raw(query)
 
     def insert_after(self, xml, where):
-        query = u"insert nodes {0} after collection('{1}'){2}". \
+        query = u'insert nodes {0} after collection("{1}"){2}'. \
                 format(xml, self.collection, where).encode('utf-8')
 
         return self.insert_raw(query)
 
     def insert_as_first(self, xml, where):
-        query = u"insert nodes {0} as first into collection('{1}'){2}". \
+        query = u'insert nodes {0} as first into collection("{1}"){2}'. \
                 format(xml, self.collection, where).encode('utf-8')
 
         return self.insert_raw(query)
 
     def insert_as_last(self, xml, where):
-        query = u"insert nodes {0} as last into collection('{1}'){2}". \
+        query = u'insert nodes {0} as last into collection("{1}"){2}'. \
                 format(xml, self.collection, where).encode('utf-8')
 
         return self.insert_raw(query)

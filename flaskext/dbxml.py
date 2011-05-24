@@ -246,6 +246,18 @@ class DBXML(object):
 
         return self.insert_raw(query)
 
+    def insert_as_first(self, xml, where):
+        query = u"insert nodes {0} as first into collection('{1}'){2}". \
+                format(xml, self.collection, where).encode('utf-8')
+
+        return self.insert_raw(query)
+
+    def insert_as_last(self, xml, where):
+        query = u"insert nodes {0} as last into collection('{1}'){2}". \
+                format(xml, self.collection, where).encode('utf-8')
+
+        return self.insert_raw(query)
+
     def replace(self, old, new):
         query = u'replace node collection("{0}"){1} with {2}'. \
                 format(self.collection, old, new).encode('utf-8')

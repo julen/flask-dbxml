@@ -48,11 +48,12 @@ class Result(object):
         return self
 
     @xmlresult
-    def all(self):
-        while self.xmlresults.hasNext():
-            self.resultset.append(self.filter(self.xmlresults.next()))
-
-        self.xmlresults.reset()
+    def all(self, first=-1, last=-1):
+        for i, xmlresult in enumerate(self.xmlresults):
+            if (first == -1 or i >= first) and (last == -1 or i < last):
+                self.resultset.append(self.filter(xmlresult))
+            else:
+                self.resultset.append(None)
 
         return self.resultset
 
@@ -85,7 +86,7 @@ class Result(object):
 
         offset = (page - 1) * per_page
         last = offset + per_page
-        items = self.all()[offset:last]
+        items = self.all(offset, last)[offset:last]
 
         if not items and page != 1 and error_out:
             abort(404)

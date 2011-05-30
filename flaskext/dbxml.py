@@ -284,12 +284,14 @@ class DBXML(object):
         query_expression = self.manager.prepare(txn, query, query_context)
 
         try:
-            self.manager.query(txn, query, query_context)
+            result = self.manager.query(txn, query, query_context)
             txn.commit()
             return True
         except XmlException, e:
             txn.abort()
             return False
+        finally:
+            del result
 
 
 class Pagination(object):

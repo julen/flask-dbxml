@@ -108,7 +108,7 @@ class DBXML(object):
         self.env = DBEnv()
         self.env.open(app.config['DBXML_ENV'],
                       DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG| \
-                      DB_INIT_MPOOL|DB_INIT_TXN|DB_RECOVER, 0)
+                      DB_INIT_MPOOL|DB_INIT_TXN|DB_THREAD|DB_RECOVER, 0)
 
         self.manager = XmlManager(self.env, DBXML_ALLOW_EXTERNAL_ACCESS)
 
@@ -118,7 +118,7 @@ class DBXML(object):
         try:
             self.container = self.manager. \
                 openContainer(app.config['DBXML_DATABASE'],
-                              DB_CREATE|DBXML_INDEX_NODES|DBXML_TRANSACTIONAL)
+                              DB_CREATE|DB_THREAD|DBXML_INDEX_NODES|DBXML_TRANSACTIONAL)
         except XmlException:
             raise
 

@@ -55,6 +55,8 @@ class Result(object):
             else:
                 self.resultset.append(None)
 
+        del self.xmlresults
+
         return self.resultset
 
     @xmlresult
@@ -63,6 +65,8 @@ class Result(object):
 
         if self.xmlresults.hasNext():
             self.resultset.append(self.filter(self.xmlresults.next()))
+
+        del self.xmlresults
 
         try:
             return self.resultset[0]

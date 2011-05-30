@@ -118,7 +118,7 @@ class DBXML(object):
         try:
             self.container = self.manager. \
                 openContainer(app.config['DBXML_DATABASE'],
-                              DB_CREATE|DBXML_TRANSACTIONAL)
+                              DB_CREATE|DBXML_INDEX_NODES|DBXML_TRANSACTIONAL)
         except XmlException:
             raise
 

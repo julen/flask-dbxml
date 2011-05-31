@@ -239,6 +239,8 @@ class DBXML(object):
             result = self.manager.query(query, query_context)
         except XmlException:
             result = []
+        finally:
+            del query_context
 
         return Result(result)
 
@@ -279,6 +281,7 @@ class DBXML(object):
         return self.insert_raw(query)
 
     def insert_raw(self, query):
+
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
 
@@ -292,8 +295,10 @@ class DBXML(object):
             return True
         except XmlException, e:
             txn.abort()
+            result = []
             return False
         finally:
+            del query_context
             del result
 
 

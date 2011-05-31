@@ -123,7 +123,17 @@ class DBXML(object):
             uc = self.manager.createUpdateContext()
             self.container.setAutoIndexing(False, uc)
         except XmlException:
+            self.cleanup()
             raise
+
+    def cleanup(self):
+        if hasattr(self, 'container'):
+            del self.container
+        if hasattr(self, 'manager'):
+            del self.manager
+        if hasattr(self, 'env'):
+            self.env.close(0)
+            del self.env
 
     def init_app(self, app):
         app.config.setdefault('DBXML_DATABASE', 'default.dbxml')

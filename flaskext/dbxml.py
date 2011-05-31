@@ -119,6 +119,9 @@ class DBXML(object):
             self.container = self.manager. \
                 openContainer(app.config['DBXML_DATABASE'],
                               DB_CREATE|DB_THREAD|DBXML_INDEX_NODES|DBXML_TRANSACTIONAL)
+
+            uc = self.manager.createUpdateContext()
+            self.container.setAutoIndexing(False, uc)
         except XmlException:
             raise
 

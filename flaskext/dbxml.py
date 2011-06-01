@@ -325,10 +325,8 @@ class DBXML(object):
 
         txn = self.manager.createTransaction()
 
-        query_expression = self.manager.prepare(txn, query, query_context)
-
         try:
-            result = query_expression.execute(query_context)
+            result = self.manager.query(txn, query, query_context)
             txn.commit()
             return True
         except XmlException, e:
@@ -337,7 +335,6 @@ class DBXML(object):
             return False
         finally:
             del query_context
-            del query_expression
             del result
 
 

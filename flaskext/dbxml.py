@@ -184,6 +184,33 @@ class DBXML(object):
             txn.abort()
             print 'Transaction failed. Aborting.'
 
+    def add_indexes(self, indexes):
+        """Programatically adds new indexes to the container.
+
+        `indexes` is a list of tuples which contains three elements:
+        namespace, the element to be indexed, and the index string.
+
+        It's highly recommended to perform this action right after creating
+        the container. Otherwise, containers need to be reindexed and
+        depending on the size of the current container, it can be a very
+        expensive operation.
+        """
+
+        txn = self.manager.createTransaction()
+        uc = self.manager.createUpdateContext()
+        index_spec = self.container.getIndexSpecification()
+
+        for (ns, element, index_string) in indexes:
+            index_spec.addIndex(ns, element, index_string)
+
+        try:
+            self.container.setIndexSpecification(txn, index_spec, uc)
+            txn.commit()
+            print 'Indexes added successfully.'
+        except XmlException:
+            txn.abort()
+            print 'Failed to add new indexes.'
+
     def generate_id(self, key):
         seq = DBSequence(self.db)
         seq.open(key, txn=None, flags=DB_CREATE)

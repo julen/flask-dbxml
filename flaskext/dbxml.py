@@ -47,6 +47,11 @@ class Result(object):
 
         return self
 
+    def as_callback(self, fn):
+        self.filter = lambda x: fn(x.asString().decode('utf-8'))
+
+        return self
+
     @xmlresult
     def all(self, first=-1, last=-1):
         for i, xmlresult in enumerate(self.xmlresults):

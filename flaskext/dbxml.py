@@ -361,7 +361,6 @@ class DBXML(object):
     def insert_raw(self, query):
 
         query_context = self.manager.createQueryContext()
-        query_context.setEvaluationType(query_context.Lazy)
 
         txn = self.manager.createTransaction()
 

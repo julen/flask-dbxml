@@ -222,12 +222,17 @@ class DBXML(object):
 
         return seq.get()
 
-    def query(self, query_string, context={}):
+    def query(self, query_string, context={}, document=None):
         query_string = query_string.encode('utf-8')
 
-        query = "collection('{0}'){1}".format(self.collection, query_string)
+        if document:
+            query = u"document('{0}'){1}".format(document,
+                                                 query_string)
+        else:
+            query = u"collection('{0}'){1}".format(self.collection,
+                                                   query_string)
 
-        return self.raw_query(query, context)
+        return self.raw_query(query.encode('utf-8'), context)
 
     def template_query(self, template_name, context={}):
 
@@ -287,41 +292,71 @@ class DBXML(object):
 
         return Result(result)
 
-    def insert_before(self, xml, where):
-        query = u'insert nodes {0} before collection("{1}"){2}'. \
-                format(xml, self.collection, where).encode('utf-8')
+    def insert_before(self, xml, where, document=None):
 
-        return self.insert_raw(query)
+        if document:
+            query = u'insert nodes {0} before document("{1}"){2}'. \
+                    format(xml, document, where)
+        else:
+            query = u'insert nodes {0} before collection("{1}"){2}'. \
+                    format(xml, self.collection, where)
 
-    def insert_after(self, xml, where):
-        query = u'insert nodes {0} after collection("{1}"){2}'. \
-                format(xml, self.collection, where).encode('utf-8')
+        return self.insert_raw(query.encode('utf-8'))
 
-        return self.insert_raw(query)
+    def insert_after(self, xml, where, document=None):
 
-    def insert_as_first(self, xml, where):
-        query = u'insert nodes {0} as first into collection("{1}"){2}'. \
-                format(xml, self.collection, where).encode('utf-8')
+        if document:
+            query = u'insert nodes {0} after document("{1}"){2}'. \
+                    format(xml, document, where)
+        else:
+            query = u'insert nodes {0} after collection("{1}"){2}'. \
+                    format(xml, self.collection, where)
 
-        return self.insert_raw(query)
+        return self.insert_raw(query.encode('utf-8'))
 
-    def insert_as_last(self, xml, where):
-        query = u'insert nodes {0} as last into collection("{1}"){2}'. \
-                format(xml, self.collection, where).encode('utf-8')
+    def insert_as_first(self, xml, where, document=None):
 
-        return self.insert_raw(query)
+        if document:
+            query = u'insert nodes {0} as first into document("{1}"){2}'. \
+                    format(xml, document, where)
+        else:
+            query = u'insert nodes {0} as first into collection("{1}"){2}'. \
+                    format(xml, self.collection, where)
 
-    def replace(self, old, new):
-        query = u'replace node collection("{0}"){1} with {2}'. \
-                format(self.collection, old, new).encode('utf-8')
+        return self.insert_raw(query.encode('utf-8'))
 
-        return self.insert_raw(query)
+    def insert_as_last(self, xml, where, document=None):
 
-    def replace_value(self, old, new):
-        query = u'replace value of node collection("{0}"){1} with "{2}"'. \
-                format(self.collection, old, new).encode('utf-8')
+        if document:
+            query = u'insert nodes {0} as last into document("{1}"){2}'. \
+                    format(xml, document, where)
+        else:
+            query = u'insert nodes {0} as last into collection("{1}"){2}'. \
+                    format(xml, self.collection, where)
 
-        return self.insert_raw(query)
+        return self.insert_raw(query.encode('utf-8'))
+
+    def replace(self, old, new, document=None):
+
+        if document:
+            query = u'replace node document("{0}"){1} with {2}'. \
+                    format(document, old, new)
+        else:
+            query = u'replace node collection("{0}"){1} with {2}'. \
+                    format(self.collection, old, new)
+
+        return self.insert_raw(query.encode('utf-8'))
+
+    def replace_value(self, old, new, document=None):
+
+        if document:
+            query = u'replace value of node document("{0}"){1} with "{2}"'. \
+                    format(document, old, new)
+        else:
+            query = u'replace value of node collection("{0}"){1} with "{2}"'. \
+                    format(self.collection, old, new)
+
+        return self.insert_raw(query.encode('utf-8'))
 
     def insert_raw(self, query):
 

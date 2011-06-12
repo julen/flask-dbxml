@@ -117,6 +117,9 @@ class DBXML(object):
 
         self.manager = XmlManager(self.env, DBXML_ALLOW_EXTERNAL_ACCESS)
 
+        if app.debug:
+            self.manager.setLogLevel(LEVEL_ALL, True)
+
         self.db = DB(self.env)
         self.db.open(app.config['DBXML_ENV'] + 'seq.db', DB_BTREE,
                      DB_AUTO_COMMIT|DB_CREATE)

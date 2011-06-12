@@ -166,7 +166,8 @@ class DBXML(object):
             del ctx.dbxml
             return response
 
-    def get_db(self):
+    @property
+    def session(self):
         ctx = _request_ctx_stack.top
         if ctx is not None:
             return ctx.dbxml

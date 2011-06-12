@@ -111,6 +111,10 @@ class DBXML(object):
 
     def connect(self, app):
         self.env = DBEnv()
+
+        self.env.set_cachesize(app.config['DBXML_CACHESIZE_GB'],
+                               app.config['DBXML_CACHESIZE_BYTES'])
+
         self.env.open(app.config['DBXML_ENV'],
                       DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG| \
                       DB_INIT_MPOOL|DB_INIT_TXN|DB_THREAD|DB_RECOVER, 0)
@@ -144,7 +148,10 @@ class DBXML(object):
             del self.env
 
     def init_app(self, app):
+
         app.config.setdefault('DBXML_DATABASE', 'default.dbxml')
+        app.config.setdefault('DBXML_CACHESIZE_GB', 0)
+        app.config.setdefault('DBXML_CACHESIZE_BYTES', 64 * 1024 * 1024)
 
         self.connect(app)
 

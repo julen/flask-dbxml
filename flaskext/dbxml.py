@@ -233,13 +233,13 @@ class DBXML(object):
         return seq.get()
 
     def query(self, query_string, context={}, document=None):
-        query_string = query_string.encode('utf-8')
 
         if document:
-            query = u"document('{0}'){1}".format(document,
-                                                 query_string)
+            query = u'doc("{0}/{1}"){2}'.format(self.collection,
+                                                document,
+                                                query_string)
         else:
-            query = u"collection('{0}'){1}".format(self.collection,
+            query = u'collection("{0}"){1}'.format(self.collection,
                                                    query_string)
 
         return self.raw_query(query.encode('utf-8'), context)
@@ -305,8 +305,8 @@ class DBXML(object):
     def insert_before(self, xml, where, document=None):
 
         if document:
-            query = u'insert nodes {0} before document("{1}"){2}'. \
-                    format(xml, document, where)
+            query = u'insert nodes {0} before doc("{1}/{2}"){3}'. \
+                    format(xml, self.collection, document, where)
         else:
             query = u'insert nodes {0} before collection("{1}"){2}'. \
                     format(xml, self.collection, where)
@@ -316,8 +316,8 @@ class DBXML(object):
     def insert_after(self, xml, where, document=None):
 
         if document:
-            query = u'insert nodes {0} after document("{1}"){2}'. \
-                    format(xml, document, where)
+            query = u'insert nodes {0} after doc("{1}/{2}"){3}'. \
+                    format(xml, self.collection, document, where)
         else:
             query = u'insert nodes {0} after collection("{1}"){2}'. \
                     format(xml, self.collection, where)
@@ -327,8 +327,8 @@ class DBXML(object):
     def insert_as_first(self, xml, where, document=None):
 
         if document:
-            query = u'insert nodes {0} as first into document("{1}"){2}'. \
-                    format(xml, document, where)
+            query = u'insert nodes {0} as first into doc("{1}/{2}"){3}'. \
+                    format(xml, self.collection, document, where)
         else:
             query = u'insert nodes {0} as first into collection("{1}"){2}'. \
                     format(xml, self.collection, where)
@@ -338,19 +338,20 @@ class DBXML(object):
     def insert_as_last(self, xml, where, document=None):
 
         if document:
-            query = u'insert nodes {0} as last into document("{1}"){2}'. \
-                    format(xml, document, where)
+            query = u'insert nodes {0} as last into doc("{1}/{2}"){3}'. \
+                    format(xml, self.collection, document, where)
         else:
             query = u'insert nodes {0} as last into collection("{1}"){2}'. \
                     format(xml, self.collection, where)
 
+        print query
         return self.insert_raw(query.encode('utf-8'))
 
     def replace(self, old, new, document=None):
 
         if document:
-            query = u'replace node document("{0}"){1} with {2}'. \
-                    format(document, old, new)
+            query = u'replace node doc("{0}/{1}"){2} with {3}'. \
+                    format(self.collection, document, old, new)
         else:
             query = u'replace node collection("{0}"){1} with {2}'. \
                     format(self.collection, old, new)
@@ -360,8 +361,8 @@ class DBXML(object):
     def replace_value(self, old, new, document=None):
 
         if document:
-            query = u'replace value of node document("{0}"){1} with "{2}"'. \
-                    format(document, old, new)
+            query = u'replace value of node doc("{0}/{1}"){2} with "{3}"'. \
+                    format(self.collection, document, old, new)
         else:
             query = u'replace value of node collection("{0}"){1} with "{2}"'. \
                     format(self.collection, old, new)

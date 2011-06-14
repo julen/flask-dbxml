@@ -306,12 +306,16 @@ class DBXML(object):
 
         _populate_context(query_context, context)
 
-        query_expression = self.manager.prepare(query, query_context)
+        txn = self.manager.createTransaction()
+
+        query_expression = self.manager.prepare(txn, query, query_context)
 
         try:
             result = query_expression.execute(query_context)
+            txn.commit()
         except XmlException:
             result = []
+            txn.abort()
         finally:
             del query_context
             del query_expression
@@ -360,7 +364,6 @@ class DBXML(object):
             query = u'insert nodes {0} as last into collection("{1}"){2}'. \
                     format(xml, self.collection, where)
 
-        print query
         return self.insert_raw(query.encode('utf-8'))
 
     def replace(self, old, new, document=None):

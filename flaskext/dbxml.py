@@ -200,6 +200,21 @@ class DBXML(object):
             txn.abort()
             print 'Transaction failed. Aborting.'
 
+    def rm_document(self, docname=None):
+        if docname is None:
+            return
+
+        update_context = self.manager.createUpdateContext()
+        txn = self.manager.createTransaction()
+
+        try:
+            self.container.deleteDocument(txn, docname, update_context)
+            txn.commit()
+            print 'Document removed successfully.'
+        except XmlException:
+            txn.abort()
+            print 'Document not found. Aborting.'
+
     def add_indexes(self, indexes):
         """Programatically adds new indexes to the container.
 

@@ -176,7 +176,7 @@ class DBXML(object):
     def collection(self):
         return 'dbxml:///' + current_app.config['DBXML_DATABASE']
 
-    def init_dbxml(self, filename=None, docname=None):
+    def add_document(self, filename=None, docname=None):
         if filename is None:
             return
 

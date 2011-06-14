@@ -248,6 +248,32 @@ class DBXML(object):
 
         return seq.get()
 
+    def _populate_context(self, qc, ctx):
+
+        def _encoded_xml_value(val):
+
+            if isinstance(val, unicode):
+                newval = val.encode('utf-8')
+            else:
+                newval = str(val)
+
+            return XmlValue(newval)
+
+        for key, value in ctx.iteritems():
+            if value is None:
+                continue
+
+            if isinstance(value, dict):
+                self._populate_context(qc, value)
+            elif isinstance(value, list):
+                for val in value:
+                    newval = self.manager.createResults()
+                    newval.add(_encoded_xml_value(val))
+            else:
+                newval = _encoded_xml_value(value)
+
+            qc.setVariableValue(key, newval)
+
     def query(self, query_string, context={}, document=None):
 
         if document:
@@ -272,31 +298,6 @@ class DBXML(object):
 
     def raw_query(self, query, context={}):
 
-        def _encoded_xml_value(val):
-
-            if isinstance(val, unicode):
-                newval = val.encode('utf-8')
-            else:
-                newval = str(val)
-
-            return XmlValue(newval)
-
-        def _populate_context(qc, ctx):
-            for key, value in ctx.iteritems():
-                if value is None:
-                    continue
-
-                if isinstance(value, dict):
-                    _populate_context(qc, value)
-                elif isinstance(value, list):
-                    for val in value:
-                        newval = self.manager.createResults()
-                        newval.add(_encoded_xml_value(val))
-                else:
-                    newval = _encoded_xml_value(value)
-
-                qc.setVariableValue(key, newval)
-
         context.update({'collection': self.collection})
 
         query_context = self.manager.createQueryContext()
@@ -304,7 +305,7 @@ class DBXML(object):
 
         query_context.setBaseURI(current_app.config['DBXML_BASE_URI'])
 
-        _populate_context(query_context, context)
+        self._populate_context(query_context, context)
 
         txn = self.manager.createTransaction()
 
@@ -388,9 +389,11 @@ class DBXML(object):
 
         return self.insert_raw(query.encode('utf-8'))
 
-    def insert_raw(self, query):
+    def insert_raw(self, query, context={}):
 
+        context.update({'collection': self.collection})
         query_context = self.manager.createQueryContext()
+        self._populate_context(query_context, context)
 
         txn = self.manager.createTransaction()
 

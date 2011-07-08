@@ -312,7 +312,7 @@ class DBXML(object):
         query_expression = self.manager.prepare(txn, query, query_context)
 
         try:
-            result = query_expression.execute(query_context)
+            result = query_expression.execute(txn, query_context).copyResults()
             txn.commit()
         except XmlException:
             result = []

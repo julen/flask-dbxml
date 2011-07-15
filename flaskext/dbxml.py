@@ -134,7 +134,6 @@ class DBXML(object):
             cc = XmlContainerConfig()
             cc.setAllowCreate(True)
             cc.setIndexNodes(True)
-            cc.setReadUncommitted(True)
             cc.setThreaded(True)
             cc.setTransactional(True)
 

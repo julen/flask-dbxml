@@ -131,9 +131,15 @@ class DBXML(object):
         self.db.open(app.config['DBXML_ENV'] + 'seq.db', DB_BTREE,
                      DB_AUTO_COMMIT|DB_CREATE)
         try:
+            cc = XmlContainerConfig()
+            cc.setAllowCreate(True)
+            cc.setIndexNodes(True)
+            cc.setReadUncommitted(True)
+            cc.setThreaded(True)
+            cc.setTransactional(True)
+
             self.container = self.manager. \
-                openContainer(app.config['DBXML_DATABASE'],
-                              DB_CREATE|DB_THREAD|DBXML_INDEX_NODES|DBXML_TRANSACTIONAL)
+                openContainer(app.config['DBXML_DATABASE'], cc)
 
             uc = self.manager.createUpdateContext()
             self.container.setAutoIndexing(False, uc)

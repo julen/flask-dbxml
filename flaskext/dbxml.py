@@ -282,7 +282,7 @@ class DBXML(object):
 
             qc.setVariableValue(key, newval)
 
-    def query(self, query_string, context={}, document=None):
+    def query(self, query_string, context={}, document=None, **kwargs):
 
         if document:
             query = u'doc("{0}/{1}"){2}'.format(self.collection,
@@ -292,9 +292,9 @@ class DBXML(object):
             query = u'collection("{0}"){1}'.format(self.collection,
                                                    query_string)
 
-        return self.raw_query(query.encode('utf-8'), context)
+        return self.raw_query(query.encode('utf-8'), context, **kwargs)
 
-    def template_query(self, template_name, context={}):
+    def template_query(self, template_name, context={}, **kwargs):
 
         # Open the template source, and pass it as the XQuery query
         jinja_env = current_app.jinja_env
@@ -302,9 +302,9 @@ class DBXML(object):
             .get_source(jinja_env, template_name)
         query = str(query.encode('utf-8'))
 
-        return self.raw_query(query, context)
+        return self.raw_query(query, context, **kwargs)
 
-    def raw_query(self, query, context={}):
+    def raw_query(self, query, context={}, txn=None, commit=True):
 
         context.update({'collection': self.collection})
 
@@ -315,23 +315,26 @@ class DBXML(object):
 
         self._populate_context(query_context, context)
 
-        txn = self.manager.createTransaction()
+        if txn is None:
+            txn = self.manager.createTransaction()
 
         query_expression = self.manager.prepare(txn, query, query_context)
 
         try:
             result = query_expression.execute(txn, query_context).copyResults()
-            txn.commit()
-        except XmlException:
+            if commit:
+                txn.commit()
+        except XmlException, e:
             result = []
-            txn.abort()
+            if commit:
+                txn.abort()
         finally:
             del query_context
             del query_expression
 
         return Result(result)
 
-    def insert_before(self, xml, where, document=None):
+    def insert_before(self, xml, where, document=None, **kwargs):
 
         if document:
             query = u'insert nodes {0} before doc("{1}/{2}"){3}'. \
@@ -340,9 +343,9 @@ class DBXML(object):
             query = u'insert nodes {0} before collection("{1}"){2}'. \
                     format(xml, self.collection, where)
 
-        return self.insert_raw(query.encode('utf-8'))
+        return self.insert_raw(query.encode('utf-8'), **kwargs)
 
-    def insert_after(self, xml, where, document=None):
+    def insert_after(self, xml, where, document=None, **kwargs):
 
         if document:
             query = u'insert nodes {0} after doc("{1}/{2}"){3}'. \
@@ -351,9 +354,9 @@ class DBXML(object):
             query = u'insert nodes {0} after collection("{1}"){2}'. \
                     format(xml, self.collection, where)
 
-        return self.insert_raw(query.encode('utf-8'))
+        return self.insert_raw(query.encode('utf-8'), **kwargs)
 
-    def insert_as_first(self, xml, where, document=None):
+    def insert_as_first(self, xml, where, document=None, **kwargs):
 
         if document:
             query = u'insert nodes {0} as first into doc("{1}/{2}"){3}'. \
@@ -362,9 +365,9 @@ class DBXML(object):
             query = u'insert nodes {0} as first into collection("{1}"){2}'. \
                     format(xml, self.collection, where)
 
-        return self.insert_raw(query.encode('utf-8'))
+        return self.insert_raw(query.encode('utf-8'), **kwargs)
 
-    def insert_as_last(self, xml, where, document=None):
+    def insert_as_last(self, xml, where, document=None, **kwargs):
 
         if document:
             query = u'insert nodes {0} as last into doc("{1}/{2}"){3}'. \
@@ -373,9 +376,9 @@ class DBXML(object):
             query = u'insert nodes {0} as last into collection("{1}"){2}'. \
                     format(xml, self.collection, where)
 
-        return self.insert_raw(query.encode('utf-8'))
+        return self.insert_raw(query.encode('utf-8'), **kwargs)
 
-    def replace(self, old, new, document=None):
+    def replace(self, old, new, document=None, **kwargs):
 
         if document:
             query = u'replace node doc("{0}/{1}"){2} with {3}'. \
@@ -384,9 +387,9 @@ class DBXML(object):
             query = u'replace node collection("{0}"){1} with {2}'. \
                     format(self.collection, old, new)
 
-        return self.insert_raw(query.encode('utf-8'))
+        return self.insert_raw(query.encode('utf-8'), **kwargs)
 
-    def replace_value(self, old, new, document=None):
+    def replace_value(self, old, new, document=None, **kwargs):
 
         if document:
             query = u'replace value of node doc("{0}/{1}"){2} with "{3}"'. \
@@ -395,23 +398,30 @@ class DBXML(object):
             query = u'replace value of node collection("{0}"){1} with "{2}"'. \
                     format(self.collection, old, new)
 
-        return self.insert_raw(query.encode('utf-8'))
+        return self.insert_raw(query.encode('utf-8'), **kwargs)
 
-    def insert_raw(self, query, context={}):
+    def insert_raw(self, query, context={}, txn=None, commit=True):
 
         context.update({'collection': self.collection})
         query_context = self.manager.createQueryContext()
         self._populate_context(query_context, context)
 
-        txn = self.manager.createTransaction()
+        if txn is None:
+            txn = self.manager.createTransaction()
 
         try:
             result = self.manager.query(txn, query, query_context)
-            txn.commit()
+
+            if commit:
+                txn.commit()
+
             return True
         except XmlException, e:
-            txn.abort()
             result = []
+
+            if commit:
+                txn.abort()
+
             return False
         finally:
             del query_context

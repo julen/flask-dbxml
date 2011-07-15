@@ -114,6 +114,9 @@ class DBXML(object):
 
         self.env.set_cachesize(app.config['DBXML_CACHESIZE_GB'],
                                app.config['DBXML_CACHESIZE_BYTES'])
+        self.env.set_lk_max_locks(10000)
+        self.env.set_lk_max_lockers(10000)
+        self.env.set_lk_max_objects(10000)
 
         self.env.open(app.config['DBXML_ENV'],
                       DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG| \

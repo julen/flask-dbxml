@@ -274,8 +274,8 @@ class DBXML(object):
             if isinstance(value, dict):
                 self._populate_context(qc, value)
             elif isinstance(value, list):
+                newval = self.manager.createResults()
                 for val in value:
-                    newval = self.manager.createResults()
                     newval.add(_encoded_xml_value(val))
             else:
                 newval = _encoded_xml_value(value)

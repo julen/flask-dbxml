@@ -118,6 +118,9 @@ class DBXML(object):
         self.env.set_lk_max_lockers(app.config['DBXML_MAX_LOCKERS'])
         self.env.set_lk_max_objects(app.config['DBXML_MAX_OBJECTS'])
 
+        if app.config.get('DBXML_LOG_AUTOREMOVE', True):
+            self.env.log_set_config(DB_LOG_AUTO_REMOVE, 1)
+
         self.env.open(app.config['DBXML_ENV'],
                       DB_CREATE|DB_INIT_LOCK|DB_INIT_LOG| \
                       DB_INIT_MPOOL|DB_INIT_TXN|DB_THREAD|DB_RECOVER_FATAL, 0)

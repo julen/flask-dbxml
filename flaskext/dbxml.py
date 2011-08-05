@@ -328,7 +328,7 @@ class DBXML(object):
             if commit:
                 txn.commit()
         except XmlException, e:
-            result = []
+            result = self.manager.createResults()
             if commit:
                 txn.abort()
         finally:

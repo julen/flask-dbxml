@@ -309,13 +309,12 @@ class DBXML(object):
 
     def raw_query(self, query, context={}, txn=None, commit=True):
 
-        context.update({'collection': self.collection})
-
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
 
         query_context.setBaseURI(current_app.config['DBXML_BASE_URI'])
 
+        context.update({'collection': self.collection})
         self._populate_context(query_context, context)
 
         if txn is None:
@@ -405,8 +404,11 @@ class DBXML(object):
 
     def insert_raw(self, query, context={}, txn=None, commit=True):
 
-        context.update({'collection': self.collection})
         query_context = self.manager.createQueryContext()
+
+        query_context.setBaseURI(current_app.config['DBXML_BASE_URI'])
+
+        context.update({'collection': self.collection})
         self._populate_context(query_context, context)
 
         if txn is None:

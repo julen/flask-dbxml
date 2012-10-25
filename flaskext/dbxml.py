@@ -207,8 +207,9 @@ class DBXML(object):
             print 'Document added successfully.'
         except XmlUniqueError:
             print 'Document already in container. Skipping.'
-        except XmlException:
+        except XmlException, e:
             txn.abort()
+            print e
             print 'Transaction failed. Aborting.'
 
     def rm_document(self, docname=None):

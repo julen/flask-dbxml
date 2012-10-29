@@ -38,18 +38,15 @@ class Result(object):
 
     def as_str(self):
         self.filter = lambda x: x.asString().decode('utf-8')
-
         return self
 
     def as_rendered(self):
         self.filter = lambda x: render_template_string(x.asString()
                                                         .decode('utf-8'))
-
         return self
 
     def as_callback(self, fn):
         self.filter = lambda x: fn(x.asString().decode('utf-8'))
-
         return self
 
     @xmlresult
@@ -61,7 +58,6 @@ class Result(object):
                 self.resultset.append(None)
 
         del self.xmlresults
-
         return self.resultset
 
     @xmlresult
@@ -72,7 +68,6 @@ class Result(object):
             self.resultset.append(self.filter(self.xmlresults.next()))
 
         del self.xmlresults
-
         try:
             return self.resultset[0]
         except IndexError:
@@ -89,7 +84,6 @@ class Result(object):
 
     @xmlresult
     def paginate(self, page, per_page, error_out=True):
-
         if error_out and page < 1:
             abort(404)
 
@@ -159,7 +153,6 @@ class DBXML(object):
             del self.env
 
     def init_app(self, app):
-
         app.config.setdefault('DBXML_DATABASE', 'default.dbxml')
         app.config.setdefault('DBXML_CACHESIZE_GB', 0)
         app.config.setdefault('DBXML_CACHESIZE_BYTES', 64 * 1024 * 1024)
@@ -238,7 +231,6 @@ class DBXML(object):
         depending on the size of the current container, it can be a very
         expensive operation.
         """
-
         txn = self.manager.createTransaction()
         uc = self.manager.createUpdateContext()
         index_spec = self.container.getIndexSpecification()
@@ -257,13 +249,11 @@ class DBXML(object):
     def generate_id(self, key):
         seq = DBSequence(self.db)
         seq.open(key, txn=None, flags=DB_CREATE)
-
         return seq.get()
 
     def _populate_context(self, qc, ctx):
 
         def _encoded_xml_value(val):
-
             if isinstance(val, unicode):
                 newval = val.encode('utf-8')
             else:
@@ -287,7 +277,6 @@ class DBXML(object):
             qc.setVariableValue(key, newval)
 
     def query(self, query_string, context={}, document=None, **kwargs):
-
         if document:
             query = u'doc("{0}/{1}"){2}'.format(self.collection,
                                                 document,
@@ -299,7 +288,6 @@ class DBXML(object):
         return self.raw_query(query.encode('utf-8'), context, **kwargs)
 
     def template_query(self, template_name, context={}, **kwargs):
-
         # Open the template source, and pass it as the XQuery query
         jinja_env = current_app.jinja_env
         (query, filename, uptodate) = jinja_env.loader \
@@ -309,7 +297,6 @@ class DBXML(object):
         return self.raw_query(query, context, **kwargs)
 
     def raw_query(self, query, context={}, txn=None, commit=True):
-
         query_context = self.manager.createQueryContext()
         query_context.setEvaluationType(query_context.Lazy)
 
@@ -338,7 +325,6 @@ class DBXML(object):
         return Result(result)
 
     def insert_before(self, xml, where, document=None, **kwargs):
-
         if document:
             query = u'insert nodes {0} before doc("{1}/{2}"){3}'. \
                     format(xml, self.collection, document, where)
@@ -349,7 +335,6 @@ class DBXML(object):
         return self.insert_raw(query.encode('utf-8'), **kwargs)
 
     def insert_after(self, xml, where, document=None, **kwargs):
-
         if document:
             query = u'insert nodes {0} after doc("{1}/{2}"){3}'. \
                     format(xml, self.collection, document, where)
@@ -360,7 +345,6 @@ class DBXML(object):
         return self.insert_raw(query.encode('utf-8'), **kwargs)
 
     def insert_as_first(self, xml, where, document=None, **kwargs):
-
         if document:
             query = u'insert nodes {0} as first into doc("{1}/{2}"){3}'. \
                     format(xml, self.collection, document, where)
@@ -371,7 +355,6 @@ class DBXML(object):
         return self.insert_raw(query.encode('utf-8'), **kwargs)
 
     def insert_as_last(self, xml, where, document=None, **kwargs):
-
         if document:
             query = u'insert nodes {0} as last into doc("{1}/{2}"){3}'. \
                     format(xml, self.collection, document, where)
@@ -382,7 +365,6 @@ class DBXML(object):
         return self.insert_raw(query.encode('utf-8'), **kwargs)
 
     def replace(self, old, new, document=None, **kwargs):
-
         if document:
             query = u'replace node doc("{0}/{1}"){2} with {3}'. \
                     format(self.collection, document, old, new)
@@ -393,7 +375,6 @@ class DBXML(object):
         return self.insert_raw(query.encode('utf-8'), **kwargs)
 
     def replace_value(self, old, new, document=None, **kwargs):
-
         if document:
             query = u'replace value of node doc("{0}/{1}"){2} with "{3}"'. \
                     format(self.collection, document, old, new)
@@ -404,7 +385,6 @@ class DBXML(object):
         return self.insert_raw(query.encode('utf-8'), **kwargs)
 
     def insert_raw(self, query, context={}, txn=None, commit=True):
-
         query_context = self.manager.createQueryContext()
 
         query_context.setBaseURI(current_app.config['DBXML_BASE_URI'])
@@ -437,7 +417,6 @@ class DBXML(object):
 class Pagination(object):
 
     def __init__(self, queryset, page, per_page, total, items):
-
         self.queryset = queryset
         self.page = page
         self.per_page = per_page

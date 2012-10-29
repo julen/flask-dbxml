@@ -126,7 +126,7 @@ class DBXML(object):
 
         self.db = DB(self.env)
         self.db.open(app.config['DBXML_ENV'] + 'seq.db', DB_BTREE,
-                     DB_AUTO_COMMIT|DB_CREATE)
+                     DB_AUTO_COMMIT|DB_CREATE|DB_THREAD)
         try:
             cc = XmlContainerConfig()
             cc.setAllowCreate(True)
@@ -248,7 +248,7 @@ class DBXML(object):
 
     def generate_id(self, key):
         seq = DBSequence(self.db)
-        seq.open(key, txn=None, flags=DB_CREATE)
+        seq.open(key, txn=None, flags=DB_CREATE|DB_THREAD)
         return seq.get()
 
     def _populate_context(self, qc, ctx):

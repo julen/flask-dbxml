@@ -10,15 +10,15 @@
 """
 from __future__ import absolute_import
 
-from flask import _request_ctx_stack, abort, current_app, render_template_string
-
-from werkzeug.utils import cached_property
+import math
+import os
 
 from bsddb3.db import *
 from dbxml import *
 
-import math
-import os
+from flask import _request_ctx_stack, abort, current_app, render_template_string
+
+from werkzeug.utils import cached_property
 
 
 def xmlresult(fn):

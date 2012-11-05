@@ -249,7 +249,7 @@ class DBXML(object):
     def generate_id(self, key):
         seq = DBSequence(self.db)
         seq.open(key, txn=None, flags=DB_CREATE|DB_THREAD)
-        return seq.get()
+        return seq.get(flags=DB_AUTO_COMMIT|DB_TXN_NOSYNC)
 
     def _populate_context(self, qc, ctx):
 

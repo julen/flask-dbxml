@@ -125,7 +125,7 @@ class DBXML(object):
             self.manager.setLogLevel(LEVEL_ALL, True)
 
         self.db = DB(self.env)
-        self.db.open(app.config['DBXML_ENV'] + 'seq.db', DB_BTREE,
+        self.db.open(os.path.join(app.config['DBXML_ENV'], 'seq.db'), DB_BTREE,
                      DB_AUTO_COMMIT|DB_CREATE|DB_THREAD)
         try:
             cc = XmlContainerConfig()
